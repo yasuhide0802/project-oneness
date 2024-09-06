@@ -1,0 +1,48 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 初期パラメータの設定
+initial_expansion_rate = 1.0  # 宇宙膨張の初期速度
+time_steps = 1000  # シミュレーションの時間ステップ数
+time = np.linspace(0, 10, time_steps)  # 時間軸（単位は仮定）
+
+# ダークエネルギーと通常物質の初期エネルギー密度
+dark_energy_density = 0.7  # ダークエネルギーの密度 (負の圧力)
+matter_energy_density = 0.3  # 物質のエネルギー密度 (正の圧力)
+
+# 宇宙の膨張率を保存するためのリスト
+expansion_rate = np.zeros(time_steps)
+expansion_rate[0] = initial_expansion_rate
+
+# 宇宙の進化をシミュレートする関数
+def universe_evolution(dark_energy_density, matter_energy_density, time_steps, time):
+    expansion_rate = np.zeros(time_steps)
+    expansion_rate[0] = initial_expansion_rate  # 初期膨張率
+
+    for t in range(1, time_steps):
+        # 時間の経過と共に物質とダークエネルギーの相対的な支配が変化するモデル
+        dark_energy_effect = dark_energy_density * np.exp(-0.01 * time[t])  # ダークエネルギーの変化
+        matter_energy_effect = matter_energy_density / (1 + time[t])  # 物質エネルギーの減少（膨張による希薄化）
+
+        # 宇宙膨張の加速（負の圧力）と減速（正の圧力）を計算
+        expansion_rate[t] = expansion_rate[t - 1] + (dark_energy_effect - matter_energy_effect) * 0.01
+
+        # 膨張率が負になった場合、収縮開始
+        if expansion_rate[t] < 0:
+            expansion_rate[t] = 0  # 膨張停止
+            break
+
+    return expansion_rate
+
+# シミュレーションの実行
+expansion_rate = universe_evolution(dark_energy_density, matter_energy_density, time_steps, time)
+
+# 宇宙の膨張率のプロット
+plt.figure(figsize=(10, 6))
+plt.plot(time, expansion_rate, label='Expansion Rate')
+plt.xlabel('Time')
+plt.ylabel('Expansion Rate')
+plt.title('Universe Expansion/Contraction Simulation')
+plt.legend()
+plt.grid(True)
+plt.show()
